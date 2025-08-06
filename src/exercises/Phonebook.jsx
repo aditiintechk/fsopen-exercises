@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { getAll, create, deletePerson, update } from '../services/persons.js'
 
 const Filter = ({ search, handleSearch }) => (
 	<div>
@@ -38,11 +38,12 @@ const PersonForm = ({
 	</form>
 )
 
-const Persons = ({ persons }) => (
+const Persons = ({ persons, onDelete }) => (
 	<div>
 		{persons.map((person) => (
 			<h4 key={person.id}>
-				{person.name} {person.number}
+				{person.name} {person.number}{' '}
+				<button onClick={() => onDelete(person.id)}>delete</button>
 			</h4>
 		))}
 	</div>
@@ -55,36 +56,53 @@ const Phonebook = () => {
 	const [search, setSearch] = useState('')
 
 	useEffect(() => {
-		console.log('effect')
-		axios
-			.get('http://localhost:3002/persons')
-			.then((response) => setPersons(response.data))
+		getAll().then((response) => setPersons(response.data))
 	}, [])
 
 	function handleSearch(e) {
 		setSearch(e.target.value)
 	}
 
+	function handleDelete(id) {
+		const confirm = window.confirm('are you sure you wanna delete?')
+		if (confirm) {
+			deletePerson(id).then((response) =>
+				setPersons(
+					persons.filter((person) => person.id !== response.data.id)
+				)
+			)
+		}
+	}
+
 	function handleSubmit(e) {
 		e.preventDefault()
-		const newPersonExists = persons.find(
-			(person) => person.name === newName
-		)
-		if (newPersonExists) {
-			alert(`${newName} is already added to phonebook`)
-			setNewName('')
-			setNewNumber('')
+		const newPerson = persons.find((person) => person.name === newName)
+		if (newPerson) {
+			// update the existing record
+			const updatedPerson = { ...newPerson, number: newNumber }
+			// send put request
+			update(newPerson.id, updatedPerson).then((response) => {
+				// update the frotend with received response
+				setPersons(
+					persons.map((person) =>
+						person.id === newPerson.id ? response.data : person
+					)
+				)
+				setNewName('')
+				setNewNumber('')
+			})
 		} else {
-			setPersons((prev) => [
-				...prev,
-				{
-					name: newName,
-					number: newNumber,
-					id: String(prev.length + 1),
-				},
-			])
-			setNewName('')
-			setNewNumber('')
+			const newData = {
+				name: newName,
+				number: newNumber,
+				// updated the id logic
+				id: String(Number(persons[persons.length - 1].id) + 1),
+			}
+			create(newData).then((response) => {
+				setPersons(persons.concat(response.data))
+				setNewName('')
+				setNewNumber('')
+			})
 		}
 	}
 
@@ -106,7 +124,7 @@ const Phonebook = () => {
 				handleSubmit={handleSubmit}
 			/>
 			{/* recall did a mistake here */}
-			<Persons persons={filteredPersons} />
+			<Persons persons={filteredPersons} onDelete={handleDelete} />
 		</div>
 	)
 }
