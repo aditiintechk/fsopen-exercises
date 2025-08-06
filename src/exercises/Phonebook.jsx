@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const Filter = ({ search, handleSearch }) => (
 	<div>
@@ -47,11 +48,18 @@ const Persons = ({ persons }) => (
 	</div>
 )
 
-const Phonebook = ({ phonebookData }) => {
-	const [persons, setPersons] = useState(phonebookData)
+const Phonebook = () => {
+	const [persons, setPersons] = useState([])
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 	const [search, setSearch] = useState('')
+
+	useEffect(() => {
+		console.log('effect')
+		axios
+			.get('http://localhost:3002/persons')
+			.then((response) => setPersons(response.data))
+	}, [])
 
 	function handleSearch(e) {
 		setSearch(e.target.value)
