@@ -28,3 +28,18 @@ h1 {
 	padding: 10px;
 	margin-bottom: 20px;
 }
+
+.show-countries {
+	margin: 10px 0;
+}
+.show-country {
+	display: flex;
+	gap: 10px;
+}
+
+ul,
+li {
+	list-style: none;
+	margin-left: 0;
+	padding-left: 0;
+}
