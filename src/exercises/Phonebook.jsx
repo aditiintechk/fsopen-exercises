@@ -54,6 +54,10 @@ const Phonebook = () => {
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 	const [search, setSearch] = useState('')
+	const [message, setMessage] = useState(
+		'Contact additions will be notified here'
+	)
+	const [error, setError] = useState('Errors will be displayed here')
 
 	useEffect(() => {
 		getAll().then((response) => setPersons(response.data))
@@ -81,16 +85,23 @@ const Phonebook = () => {
 			// update the existing record
 			const updatedPerson = { ...newPerson, number: newNumber }
 			// send put request
-			update(newPerson.id, updatedPerson).then((response) => {
-				// update the frotend with received response
-				setPersons(
-					persons.map((person) =>
-						person.id === newPerson.id ? response.data : person
+			update(newPerson.id, updatedPerson)
+				.then((response) => {
+					// update the frontend with received response
+					setPersons(
+						persons.map((person) =>
+							person.id === newPerson.id ? response.data : person
+						)
 					)
-				)
-				setNewName('')
-				setNewNumber('')
-			})
+					setMessage(`Updated ${newPerson.name} contact details`)
+					setNewName('')
+					setNewNumber('')
+				})
+				.catch(() => {
+					setError(
+						`${newPerson.name} has been removed from the server`
+					)
+				})
 		} else {
 			const newData = {
 				name: newName,
@@ -100,6 +111,7 @@ const Phonebook = () => {
 			}
 			create(newData).then((response) => {
 				setPersons(persons.concat(response.data))
+				setMessage(`Added ${response.data.name}`)
 				setNewName('')
 				setNewNumber('')
 			})
@@ -113,7 +125,9 @@ const Phonebook = () => {
 
 	return (
 		<div>
-			<h2>Phonebook</h2>
+			<h1>Phonebook</h1>
+			{message && <div className='message'>{message}</div>}
+			{error && <div className='error'>{error}</div>}
 			<Filter search={search} handleSearch={handleSearch} />
 			<h3>add a new</h3>
 			<PersonForm
@@ -123,7 +137,6 @@ const Phonebook = () => {
 				setNewNumber={setNewNumber}
 				handleSubmit={handleSubmit}
 			/>
-			{/* recall did a mistake here */}
 			<Persons persons={filteredPersons} onDelete={handleDelete} />
 		</div>
 	)
