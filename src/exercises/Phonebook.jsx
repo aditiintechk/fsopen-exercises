@@ -61,7 +61,7 @@ const Phonebook = () => {
 
 	useEffect(() => {
 		getAll().then((response) => setPersons(response.data))
-	}, [])
+	}, [persons])
 
 	function handleSearch(e) {
 		setSearch(e.target.value)
@@ -70,11 +70,11 @@ const Phonebook = () => {
 	function handleDelete(id) {
 		const confirm = window.confirm('are you sure you wanna delete?')
 		if (confirm) {
-			deletePerson(id).then((response) =>
+			deletePerson(id).then((response) => {
 				setPersons(
 					persons.filter((person) => person.id !== response.data.id)
 				)
-			)
+			})
 		}
 	}
 
@@ -106,15 +106,23 @@ const Phonebook = () => {
 			const newData = {
 				name: newName,
 				number: newNumber,
-				// updated the id logic
-				id: String(Number(persons[persons.length - 1].id) + 1),
 			}
-			create(newData).then((response) => {
-				setPersons(persons.concat(response.data))
-				setMessage(`Added ${response.data.name}`)
-				setNewName('')
-				setNewNumber('')
-			})
+			create(newData)
+				.then((response) => {
+					setPersons(persons.concat(response.data))
+					setMessage(`Added ${response.data.name}`)
+					setTimeout(() => {
+						setMessage('Contact additions will be notifies here')
+					}, 2000)
+					setNewName('')
+					setNewNumber('')
+				})
+				.catch((error) => {
+					setError(error.response.data.error)
+					setTimeout(() => {
+						setError('Errors will be displayed here')
+					}, 3000)
+				})
 		}
 	}
 

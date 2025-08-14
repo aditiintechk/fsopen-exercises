@@ -22,7 +22,7 @@ const Anecdote = () => {
 	}
 
 	const handleVote = () => {
-		// recall always create a copy
+		// recall: always create a copy
 		const newVotes = [...votes]
 		newVotes[selected] += 1
 		setVotes(newVotes)
