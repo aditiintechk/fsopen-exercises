@@ -9,11 +9,11 @@ import { courses } from './data.js'
 const App = () => {
 	return (
 		<div>
-			{/* <Anecdote />
-			<Course courses={courses} />
+			{/* <Anecdote /> */}
+			{/* <Course courses={courses} /> */}
 			<Phonebook />
-			<Currency /> */}
-			<Countries />
+			{/* <Currency /> */}
+			{/* <Countries /> */}
 		</div>
 	)
 }

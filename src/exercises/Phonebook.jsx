@@ -118,7 +118,7 @@ const Phonebook = () => {
 		}
 	}
 
-	// recall derived state approach!
+	// recall: derived state approach!
 	const filteredPersons = persons.filter((person) =>
 		person.name.toLowerCase().includes(search.toLowerCase())
 	)
